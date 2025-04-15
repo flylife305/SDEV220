@@ -1,3 +1,5 @@
+#import needed files from flask
+
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
@@ -9,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
 db = SQLAlchemy(app)
 app.app_context().push()
 
+# defines Book class
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     book_name = db.Column(db.String(80), unique=True, nullable=False)
@@ -19,11 +22,12 @@ class Book(db.Model):
         return f"{self.id} is titled {self.book_name} by {self.author} published by {self.publisher}"
 
 
-
+#initial route for website for test case
 @app.route('/')
 def index():
     return "Hello!"
 
+#route for 'books' dictionary
 @app.route('/books')
 def get_books():
     books = Book.query.all()
@@ -41,6 +45,7 @@ def get_books():
 
     return {"books": output}
 
+#route for getting a specific book
 @app.route('/books/<int:book_id>')
 def get_book(book_id):
     book = Book.query.get_or_404(book_id)
@@ -50,7 +55,7 @@ def get_book(book_id):
         'author': book.author,
         'publisher': book.publisher
     }
-
+#route for adding a book
 @app.route('/books', methods=['POST'])
 def add_book():
     book= Book(id=request.json['id'], 
@@ -65,7 +70,7 @@ def add_book():
         'author': book.author,
         'publisher': book.publisher
     }
-
+#route for deleting a book
 @app.route('/books/<id>', methods=['DELETE'])
 def delete_book(id):
     book = Book.query.get(id)
